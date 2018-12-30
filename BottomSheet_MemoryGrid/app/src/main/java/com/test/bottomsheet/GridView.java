@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.os.Build;
 import android.os.Debug;
 import android.os.Handler;
@@ -78,8 +77,8 @@ public class GridView extends View {
         drawPoint(canvas);
     }
 
-    int delta = 60;
-    int megForWholeHeight = 125;  //the whole height is for 125 mb
+    int gridHeight = 60;
+    int megForOneGrid = 15;  //how many meg one grid height is for
     private void drawPoint(Canvas canvas) {
         int last_x = 0;
         double last_y = 0;
@@ -97,7 +96,7 @@ public class GridView extends View {
             int x = (i==0) ? x_offset : last_x;
             double y = (i==0) ? baseHight-p : last_y;
 
-            x_offset += delta;
+            x_offset += gridHeight;
             double p2 = point[i++];
 
             int x2 = x_offset;
@@ -121,11 +120,11 @@ public class GridView extends View {
             canvas.drawLine(0, height_offset, w, height_offset, gridPaint);
 
             if (i != 0 && (i % 2 != 0)) {
-                String label = ((i * delta) * megForWholeHeight / h) + "MB";
+                String label = ((i * megForOneGrid)) + "MB";
                 canvas.drawText(label, 10, height_offset+20, textPaint);
             }
 
-            height_offset -= delta;
+            height_offset -= gridHeight;
 
             Log.w("+++", "+++, drawGrid(),i:"+i+", height_offset:"+height_offset);
         }
@@ -193,23 +192,25 @@ public class GridView extends View {
 
         height = (height>100) ? height : calcedHeight;
 
-        long memUse = getAppMemory();
-        double howManyMegUnit = (memUse * height) / (1024.0 * megForWholeHeight);
+        long memUse = getAppMemory(); //kb
+
+        // (y_height / usage_MB) = (one_grid_height / meg_per_one_grid)
+        double heightForTheMemoryUsage = (memUse * gridHeight) / (1024.0 * megForOneGrid);
 
         for (int i=0; i<point.length-1; i++) {// shift
             point[i] = point[i+1];
         }
-        point[point.length-1] = howManyMegUnit;  //memUse;
+        point[point.length-1] = heightForTheMemoryUsage;  //memUse;
 
         for (int i=point.length-2; i>=0; i--) {// shift for first time fill with memory usage
             if (point[i] < 0) {
-                point[i] = howManyMegUnit;
+                point[i] = heightForTheMemoryUsage;
             } else {
                 break;
             }
         }
 
-        Log.w("+++", "+++ collectMemoryInfo(), mem:"+memUse+", usedMemInKB:"+getUsedMemorySize()+", howManyMegUnit:"+howManyMegUnit);
+        Log.w("+++", "+++ collectMemoryInfo(), mem:"+memUse+", usedMemInKB:"+getUsedMemorySize()+", heightForTheMemoryUsage:"+heightForTheMemoryUsage);
 
     }
 
