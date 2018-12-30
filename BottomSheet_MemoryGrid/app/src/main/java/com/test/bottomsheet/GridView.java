@@ -187,10 +187,10 @@ public class GridView extends View {
 
     public void collectMemoryInfo() {
 
-        long height = getHeight();
-        long calcedHeight = dipsToPixels(getContext(), 100);
-
-        height = (height>100) ? height : calcedHeight;
+//        long height = getHeight();
+//        long calcedHeight = dipsToPixels(getContext(), 150);
+//
+//        height = (height>100) ? height : calcedHeight;
 
         long memUse = getAppMemory(); //kb
 
