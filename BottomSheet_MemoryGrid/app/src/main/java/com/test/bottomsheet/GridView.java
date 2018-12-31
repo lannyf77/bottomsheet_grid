@@ -69,6 +69,32 @@ public class GridView extends View {
 
         initPoints();
     }
+    
+        ///
+    @Override
+    protected void onAttachedToWindow() {
+        // TODO Auto-generated method stub
+        super.onAttachedToWindow();
+
+        Log.e("+++","+++ onAttachedToWindow called for " + getId()+", (View)getParent()).getId():"+((View)getParent()).getId());
+//        if(((View)getParent()).getId()== R.id.relativelayout2)
+//        {
+//            Log.d("CustomView","onAttachedToWindow called for " + getId());
+//            Toast.makeText(context, "added", 1000).show();
+//        }
+
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Log.e("+++","+++ +++ +++ @@@ onDetachedFromWindow() called for " + getId()+", (View)getParent()).getId():"+((View)getParent()).getId());
+
+        //stopHandler();
+
+    }
+    ///
+
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -97,7 +123,7 @@ public class GridView extends View {
             double y = (i==0) ? baseHight-p : last_y;
 
             x_offset += gridHeight;
-            double p2 = point[i++];
+            double p2 = point[i+1];
 
             int x2 = x_offset;
             double y2 = baseHight-p2;
@@ -242,5 +268,10 @@ public class GridView extends View {
             timer.purge();
             timer = null;
         }
+    }
+    
+    
+    public void stopHandler() {
+        mHandler.removeCallbacksAndMessages(null);
     }
 }
