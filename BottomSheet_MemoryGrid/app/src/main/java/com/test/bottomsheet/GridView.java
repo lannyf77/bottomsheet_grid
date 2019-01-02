@@ -106,6 +106,45 @@ public class GridView extends View {
     int gridHeight = 60;
     int megForOneGrid = 15;  //how many meg one grid height is for
     private void drawPoint(Canvas canvas) {
+        int last_x = getWidth();
+        double last_y = 0;
+
+        int x_offset = getWidth();
+        int baseHight = getHeight();
+        for (int i=point.length-1; i >=0 && x_offset>0; i--) {
+
+            x_offset = last_x;
+            double memUse = point[i];
+
+            // (y_height / usage_MB) = (one_grid_height / meg_per_one_grid)
+            double p = memUse * gridHeight / (1024.0 * megForOneGrid);
+
+
+            Log.i("+++", "+++, drawPoint(),i:"+i+", memUse:"+memUse+", p:"+p+", x_offset:"+x_offset+
+                    ", getWidth():"+getWidth()+", getHeight():"+getHeight());
+
+            int x = (i == point.length-1) ? x_offset : last_x;
+            double y = (i == point.length-1) ? baseHight-p : last_y;
+
+            x_offset -= gridHeight;
+            double memUse2 = point[i-1];
+            // (y_height / usage_MB) = (one_grid_height / meg_per_one_grid)
+            double p2 = memUse2 * gridHeight / (1024.0 * megForOneGrid);
+
+            int x2 = x_offset;
+            double y2 = baseHight-p2;
+
+            canvas.drawLine(x, (float)y, x2, (float)y2, paint);
+
+            //
+            canvas.drawLine(x2, baseHight, x2, (float)y2, paint);
+
+            last_x = x2;
+            last_y = y2;
+        }
+    }
+
+    private void drawPoint_org(Canvas canvas) {
         int last_x = 0;
         double last_y = 0;
 
@@ -220,23 +259,28 @@ public class GridView extends View {
 
         long memUse = getAppMemory(); //kb
 
-        // (y_height / usage_MB) = (one_grid_height / meg_per_one_grid)
-        double heightForTheMemoryUsage = (memUse * gridHeight) / (1024.0 * megForOneGrid);
+//        // (y_height / usage_MB) = (one_grid_height / meg_per_one_grid)
+//        double heightForTheMemoryUsage = (memUse * gridHeight) / (1024.0 * megForOneGrid);
 
         for (int i=0; i<point.length-1; i++) {// shift
             point[i] = point[i+1];
         }
-        point[point.length-1] = heightForTheMemoryUsage;  //memUse;
+
+        /// fake data
+        //point[point.length-1] = 50*1024*Math.random();
+        ///
+
+        point[point.length-1] = memUse; //heightForTheMemoryUsage;  //memUse;
 
         for (int i=point.length-2; i>=0; i--) {// shift for first time fill with memory usage
             if (point[i] < 0) {
-                point[i] = heightForTheMemoryUsage;
+                point[i] = memUse;  //heightForTheMemoryUsage;
             } else {
                 break;
             }
         }
 
-        Log.w("+++", "+++ collectMemoryInfo(), mem:"+memUse+", usedMemInKB:"+getUsedMemorySize()+", heightForTheMemoryUsage:"+heightForTheMemoryUsage);
+        Log.w("+++", "+++ collectMemoryInfo(), mem:"+memUse+", usedMemInKB:"+getUsedMemorySize());
 
     }
 
